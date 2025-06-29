@@ -4,10 +4,7 @@ import requests
 app = Flask(__name__)
 
 API_KEY = "2b10gDdQqkjMJ5gucOEEJ13e"
-
-@app.route("/")
-def index():
-    return "API PlantNet attiva!"
+PROJECT = "all"  # o un altro progetto specifico se serve
 
 @app.route("/identify", methods=["POST"])
 def identify():
@@ -15,18 +12,19 @@ def identify():
         return jsonify({"error": "Nessuna immagine ricevuta"}), 400
 
     image = request.files['image']
-    organs = request.form.get('organs', 'leaf')  # default: leaf
+    organs = request.form.get('organs', 'leaf')
 
-    plantnet_url = "https://my-api.plantnet.org/v2/identify/all"
+    plantnet_url = f"https://my-api.plantnet.org/v2/identify/{PROJECT}?api-key={API_KEY}"
 
     files = {'images': (image.filename, image.stream, image.mimetype)}
-    data = {
-        'organs': organs,
-        'api-key': API_KEY
-    }
+    data = {'organs': organs}
 
     response = requests.post(plantnet_url, files=files, data=data)
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        return jsonify({"error": str(e), "details": response.text}), 500
+
     result = response.json()
 
     top = []
