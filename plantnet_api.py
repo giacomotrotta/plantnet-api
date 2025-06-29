@@ -15,11 +15,13 @@ def identify():
         return jsonify({"error": "Nessuna immagine ricevuta"}), 400
 
     image = request.files['image']
+    organs = request.form.get('organs', 'leaf')  # default: leaf
+
     plantnet_url = "https://my-api.plantnet.org/v2/identify/all"
 
-    files = {'images': image.stream}
+    files = {'images': (image.filename, image.stream, image.mimetype)}
     data = {
-        'organs': 'leaf',
+        'organs': organs,
         'api-key': API_KEY
     }
 
