@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: plantnet-api
+    runtime: python
+    buildCommand: ""
+    startCommand: gunicorn plantnet_api:app
+    plan: free
+    envVars:
+      - key: FLASK_ENV
+        value: production
